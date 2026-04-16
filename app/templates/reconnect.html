@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Reconnect – Personal CRM{% endblock %}
+{% block content %}
+
+<h1 class="text-2xl font-bold mb-2">Reconnect</h1>
+<p class="text-sm text-gray-500 mb-6">People you haven't been in touch with recently.</p>
+
+<div x-data="{ tab: '90' }">
+
+  <!-- Tabs -->
+  <div class="flex gap-1 bg-gray-100 rounded-lg p-1 w-fit mb-6">
+    <button @click="tab = '90'" :class="tab === '90' ? 'bg-white shadow text-red-600' : 'text-gray-500 hover:text-gray-700'" class="px-4 py-1.5 rounded-md text-sm font-medium transition">
+      90+ days ({{ contacts_90 | length }})
+    </button>
+    <button @click="tab = '60'" :class="tab === '60' ? 'bg-white shadow text-orange-600' : 'text-gray-500 hover:text-gray-700'" class="px-4 py-1.5 rounded-md text-sm font-medium transition">
+      60–90 days ({{ contacts_60 | length }})
+    </button>
+    <button @click="tab = '30'" :class="tab === '30' ? 'bg-white shadow text-yellow-600' : 'text-gray-500 hover:text-gray-700'" class="px-4 py-1.5 rounded-md text-sm font-medium transition">
+      30–60 days ({{ contacts_30 | length }})
+    </button>
+    <button @click="tab = 'never'" :class="tab === 'never' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'" class="px-4 py-1.5 rounded-md text-sm font-medium transition">
+      Never ({{ contacts_never | length }})
+    </button>
+  </div>
+
+  {% macro contact_row(c, label) %}
+  <div class="px-4 py-3 flex items-center gap-3">
+    {% include "partials/avatar.html" %}
+    <div class="flex-1 min-w-0">
+      <a href="/contacts/{{ c.id }}" class="text-sm font-medium text-gray-900 hover:text-indigo-600">{{ c.full_name }}</a>
+      {% if c.company or c.job_title %}
+      <p class="text-xs text-gray-400 truncate">{{ c.job_title or "" }}{% if c.job_title and c.company %} at {% endif %}{{ c.company or "" }}</p>
+      {% endif %}
+    </div>
+    <span class="text-xs text-gray-400 flex-shrink-0">{{ label }}</span>
+  </div>
+  {% endmacro %}
+
+  <div x-show="tab === '90'">
+    {% if contacts_90 %}
+    <div class="bg-white rounded-xl border border-red-200 divide-y divide-gray-100">
+      {% for c in contacts_90 %}{{ contact_row(c, ((now - c.last_contacted_at).days | string) + " days ago") }}{% endfor %}
+    </div>
+    {% else %}<p class="text-sm text-gray-400 py-8 text-center">No contacts in this range.</p>{% endif %}
+  </div>
+
+  <div x-show="tab === '60'">
+    {% if contacts_60 %}
+    <div class="bg-white rounded-xl border border-orange-200 divide-y divide-gray-100">
+      {% for c in contacts_60 %}{{ contact_row(c, ((now - c.last_contacted_at).days | string) + " days ago") }}{% endfor %}
+    </div>
+    {% else %}<p class="text-sm text-gray-400 py-8 text-center">No contacts in this range.</p>{% endif %}
+  </div>
+
+  <div x-show="tab === '30'">
+    {% if contacts_30 %}
+    <div class="bg-white rounded-xl border border-yellow-200 divide-y divide-gray-100">
+      {% for c in contacts_30 %}{{ contact_row(c, ((now - c.last_contacted_at).days | string) + " days ago") }}{% endfor %}
+    </div>
+    {% else %}<p class="text-sm text-gray-400 py-8 text-center">No contacts in this range.</p>{% endif %}
+  </div>
+
+  <div x-show="tab === 'never'">
+    {% if contacts_never %}
+    <div class="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
+      {% for c in contacts_never %}{{ contact_row(c, "never") }}{% endfor %}
+    </div>
+    {% else %}<p class="text-sm text-gray-400 py-8 text-center">All contacts have been reached out to!</p>{% endif %}
+  </div>
+
+</div>
+{% endblock %}

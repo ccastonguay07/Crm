@@ -15,6 +15,8 @@ class Settings(BaseSettings):
     app_port: int = 8000
     debug: bool = True
     web_base_url: str = "http://localhost:8000"
+    slack_owner_user_id: str = ""   # Your Slack user ID (e.g. U01234ABCDE) for DM notifications
+    digest_time: str = "09:00"      # UTC time for daily digest (HH:MM)
 
 
 @lru_cache

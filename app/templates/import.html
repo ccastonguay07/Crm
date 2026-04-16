@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Import Contacts – Personal CRM{% endblock %}
+{% block content %}
+
+<div class="max-w-2xl">
+  <h1 class="text-2xl font-bold mb-2">Import Contacts</h1>
+  <p class="text-sm text-gray-500 mb-6">Upload a CSV file from Google Contacts or LinkedIn. Column names are detected automatically.</p>
+
+  <div class="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+    <form method="post" action="/import" enctype="multipart/form-data" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">CSV file</label>
+        <input type="file" name="file" accept=".csv" required
+          class="w-full text-sm text-gray-600 border border-gray-300 rounded-md px-3 py-2 file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-sm file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
+      </div>
+
+      <label class="flex items-center gap-2 cursor-pointer">
+        <input type="checkbox" name="skip_duplicates" value="true" checked
+          class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
+        <span class="text-sm text-gray-700">Skip contacts that already exist (fuzzy name match)</span>
+      </label>
+
+      <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-md text-sm hover:bg-indigo-700">Upload & Import</button>
+    </form>
+  </div>
+
+  <!-- Supported formats -->
+  <div class="mt-8 space-y-4">
+    <h2 class="text-sm font-semibold text-gray-700">Supported export formats</h2>
+
+    <div class="bg-white rounded-xl border border-gray-200 p-4 space-y-2">
+      <p class="text-sm font-medium">Google Contacts</p>
+      <ol class="text-xs text-gray-500 list-decimal list-inside space-y-0.5">
+        <li>Open <a href="https://contacts.google.com" target="_blank" class="text-indigo-500 hover:underline">contacts.google.com</a></li>
+        <li>Click the export icon (top-right) → Export as <strong>Google CSV</strong></li>
+        <li>Upload the downloaded file here</li>
+      </ol>
+    </div>
+
+    <div class="bg-white rounded-xl border border-gray-200 p-4 space-y-2">
+      <p class="text-sm font-medium">LinkedIn Connections</p>
+      <ol class="text-xs text-gray-500 list-decimal list-inside space-y-0.5">
+        <li>Go to LinkedIn → Settings → Data Privacy → Get a copy of your data</li>
+        <li>Request <strong>Connections</strong> export → download the zip</li>
+        <li>Upload <code class="bg-gray-100 px-1 rounded">Connections.csv</code> from the zip here</li>
+      </ol>
+    </div>
+
+    <div class="bg-white rounded-xl border border-gray-200 p-4 space-y-2">
+      <p class="text-sm font-medium">Generic CSV</p>
+      <p class="text-xs text-gray-500">Any CSV with a <code class="bg-gray-100 px-1 rounded">Name</code> or <code class="bg-gray-100 px-1 rounded">Full Name</code> column. Optional columns: <code class="bg-gray-100 px-1 rounded">Email</code>, <code class="bg-gray-100 px-1 rounded">Phone</code>, <code class="bg-gray-100 px-1 rounded">Company</code>, <code class="bg-gray-100 px-1 rounded">Job Title</code>, <code class="bg-gray-100 px-1 rounded">Tags</code> (comma/semicolon-separated), <code class="bg-gray-100 px-1 rounded">Notes</code>.</p>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

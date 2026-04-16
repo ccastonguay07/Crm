@@ -1,7 +1,9 @@
-from datetime import date, datetime
+import csv
+import io
+from datetime import date, datetime, timedelta
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Form, Request
+from fastapi import APIRouter, Depends, File, Form, Request, UploadFile
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
@@ -247,6 +249,38 @@ async def add_followup_web(
     return RedirectResponse(url=f"/contacts/{contact_id}", status_code=303)
 
 
+@router.get("/reconnect", response_class=HTMLResponse)
+def reconnect_page(request: Request, db: Session = Depends(get_db)):
+    all_contacts = crud_contacts.get_contacts(db, limit=10000)
+    cutoff_30 = datetime.utcnow() - timedelta(days=30)
+    cutoff_60 = datetime.utcnow() - timedelta(days=60)
+    cutoff_90 = datetime.utcnow() - timedelta(days=90)
+    contacts_90 = sorted(
+        [c for c in all_contacts if c.last_contacted_at and c.last_contacted_at < cutoff_90],
+        key=lambda c: c.last_contacted_at,
+    )
+    contacts_60 = sorted(
+        [c for c in all_contacts if c.last_contacted_at and cutoff_90 <= c.last_contacted_at < cutoff_60],
+        key=lambda c: c.last_contacted_at,
+    )
+    contacts_30 = sorted(
+        [c for c in all_contacts if c.last_contacted_at and cutoff_60 <= c.last_contacted_at < cutoff_30],
+        key=lambda c: c.last_contacted_at,
+    )
+    contacts_never = [c for c in all_contacts if not c.last_contacted_at]
+    return templates.TemplateResponse(
+        "reconnect.html",
+        {
+            "request": request,
+            "contacts_90": contacts_90,
+            "contacts_60": contacts_60,
+            "contacts_30": contacts_30,
+            "contacts_never": contacts_never,
+            "now": datetime.utcnow(),
+        },
+    )
+
+
 @router.get("/followups", response_class=HTMLResponse)
 def followups_list(request: Request, db: Session = Depends(get_db)):
     overdue = crud_followups.get_all_followups(db, overdue_only=True)
@@ -271,3 +305,122 @@ def complete_followup_web(request: Request, followup_id: int, db: Session = Depe
     crud_followups.complete_followup(db, followup_id)
     flash(request, "Follow-up marked as complete.")
     return RedirectResponse(url="/followups", status_code=303)
+
+
+# ---------------------------------------------------------------------------
+# CSV Import
+# ---------------------------------------------------------------------------
+
+# Column name aliases — maps common CSV headers to our field names.
+# Supports Google Contacts and LinkedIn export formats.
+_COL_MAP = {
+    # Name
+    "name": "full_name", "full name": "full_name",
+    "first name": "_first_name", "given name": "_first_name",
+    "last name": "_last_name", "family name": "_last_name",
+    # Contact info
+    "e-mail address": "email", "email address": "email", "email 1 - value": "email",
+    "phone": "phone", "phone number": "phone", "mobile phone": "phone",
+    "phone 1 - value": "phone",
+    # Work
+    "company": "company", "organization": "company", "organization 1 - name": "company",
+    "job title": "job_title", "title": "job_title", "position": "job_title",
+    "organization 1 - title": "job_title",
+    # Social
+    "linkedin": "linkedin_url", "linkedin url": "linkedin_url",
+    "twitter": "twitter_handle", "twitter handle": "twitter_handle",
+    "github": "github_username",
+    "website": "website_url", "website url": "website_url",
+    # Other
+    "location": "location", "city": "location", "address": "location",
+    "notes": "notes", "note": "notes",
+    "birthday": "birthday", "birth date": "birthday",
+    "tags": "tags", "labels": "tags", "group membership": "tags",
+}
+
+
+def _parse_csv_row(row: dict) -> dict:
+    """Normalise a CSV row dict into contact field dict."""
+    result = {}
+    first = last = None
+
+    for raw_key, value in row.items():
+        if not value or not value.strip():
+            continue
+        key = raw_key.strip().lower()
+        mapped = _COL_MAP.get(key)
+        if mapped == "_first_name":
+            first = value.strip()
+        elif mapped == "_last_name":
+            last = value.strip()
+        elif mapped and mapped not in result:
+            result[mapped] = value.strip()
+
+    # Compose full_name from parts if not already set
+    if "full_name" not in result:
+        if first or last:
+            result["full_name"] = " ".join(filter(None, [first, last]))
+
+    return result
+
+
+@router.get("/import", response_class=HTMLResponse)
+def import_page(request: Request):
+    return templates.TemplateResponse("import.html", {"request": request})
+
+
+@router.post("/import")
+async def import_contacts(
+    request: Request,
+    file: UploadFile = File(...),
+    skip_duplicates: bool = Form(True),
+    db: Session = Depends(get_db),
+):
+    content = await file.read()
+    try:
+        text = content.decode("utf-8-sig")  # strip BOM if present
+    except UnicodeDecodeError:
+        text = content.decode("latin-1")
+
+    reader = csv.DictReader(io.StringIO(text))
+    created = skipped = errors = 0
+
+    for row in reader:
+        fields = _parse_csv_row(row)
+        if not fields.get("full_name"):
+            errors += 1
+            continue
+
+        # Duplicate check
+        existing = crud_contacts.find_contact_by_name(db, fields["full_name"])
+        if existing and skip_duplicates:
+            skipped += 1
+            continue
+
+        # Parse tags (semicolon or comma separated)
+        raw_tags = fields.pop("tags", "") or ""
+        tag_list = [t.strip() for t in raw_tags.replace(";", ",").split(",") if t.strip()]
+
+        # Parse birthday
+        birthday = None
+        raw_bday = fields.pop("birthday", None)
+        if raw_bday:
+            from dateutil import parser as dp
+            try:
+                birthday = dp.parse(raw_bday).date()
+            except Exception:
+                pass
+
+        try:
+            data = ContactCreate(
+                **{k: v for k, v in fields.items() if k in ContactCreate.model_fields},
+                birthday=birthday,
+                tags=tag_list,
+            )
+            crud_contacts.create_contact(db, data)
+            created += 1
+        except Exception:
+            errors += 1
+
+    flash(request, f"Import complete: {created} created, {skipped} skipped (duplicates), {errors} errors.")
+    return RedirectResponse(url="/contacts", status_code=303)

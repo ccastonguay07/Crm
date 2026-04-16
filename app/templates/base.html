@@ -19,6 +19,8 @@
           <a href="/" class="text-sm text-gray-600 hover:text-gray-900 {% if request.url.path == '/' %}font-semibold text-gray-900{% endif %}">Dashboard</a>
           <a href="/contacts" class="text-sm text-gray-600 hover:text-gray-900 {% if '/contacts' in request.url.path %}font-semibold text-gray-900{% endif %}">Contacts</a>
           <a href="/followups" class="text-sm text-gray-600 hover:text-gray-900 {% if '/followups' in request.url.path %}font-semibold text-gray-900{% endif %}">Follow-ups</a>
+          <a href="/reconnect" class="text-sm text-gray-600 hover:text-gray-900 {% if '/reconnect' in request.url.path %}font-semibold text-gray-900{% endif %}">Reconnect</a>
+          <a href="/import" class="text-sm text-gray-600 hover:text-gray-900 {% if '/import' in request.url.path %}font-semibold text-gray-900{% endif %}">Import</a>
         </div>
         <a href="/contacts/new" class="text-sm bg-indigo-600 text-white px-3 py-1.5 rounded-md hover:bg-indigo-700 transition">+ Add Contact</a>
       </div>
