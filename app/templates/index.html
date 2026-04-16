@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}Dashboard – Personal CRM{% endblock %}
+{% block content %}
+
+<h1 class="text-2xl font-bold mb-6">Dashboard</h1>
+
+<!-- Stats -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+  <div class="bg-white rounded-xl border border-gray-200 p-4">
+    <p class="text-xs text-gray-500 uppercase tracking-wide">Total Contacts</p>
+    <p class="text-3xl font-bold text-indigo-600">{{ total_contacts }}</p>
+  </div>
+  <div class="bg-white rounded-xl border border-gray-200 p-4">
+    <p class="text-xs text-gray-500 uppercase tracking-wide">Added This Week</p>
+    <p class="text-3xl font-bold text-green-600">{{ added_this_week }}</p>
+  </div>
+  <div class="bg-white rounded-xl border border-gray-200 p-4">
+    <p class="text-xs text-gray-500 uppercase tracking-wide">Overdue Follow-ups</p>
+    <p class="text-3xl font-bold text-red-500">{{ overdue_followups | length }}</p>
+  </div>
+  <div class="bg-white rounded-xl border border-gray-200 p-4">
+    <p class="text-xs text-gray-500 uppercase tracking-wide">Upcoming (7 days)</p>
+    <p class="text-3xl font-bold text-yellow-500">{{ upcoming_followups | length }}</p>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+  <!-- Overdue Follow-ups -->
+  {% if overdue_followups %}
+  <div class="bg-white rounded-xl border border-red-200">
+    <div class="px-4 py-3 border-b border-red-100 flex justify-between items-center">
+      <h2 class="font-semibold text-red-700">Overdue Follow-ups</h2>
+      <a href="/followups" class="text-xs text-red-500 hover:underline">View all</a>
+    </div>
+    <ul class="divide-y divide-gray-100">
+      {% for f in overdue_followups[:5] %}
+      <li class="px-4 py-3 flex justify-between items-center">
+        <div>
+          <a href="/contacts/{{ f.contact.id }}" class="text-sm font-medium text-gray-900 hover:text-indigo-600">{{ f.contact.full_name }}</a>
+          <p class="text-xs text-gray-500">{{ f.description }}</p>
+        </div>
+        <div class="text-right">
+          <span class="text-xs text-red-500 font-medium">{{ f.due_date }}</span>
+          <form method="post" action="/followups/{{ f.id }}/complete" class="mt-1">
+            <button class="text-xs text-gray-400 hover:text-green-600">✓ Done</button>
+          </form>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  <!-- Upcoming Follow-ups -->
+  {% if upcoming_followups %}
+  <div class="bg-white rounded-xl border border-gray-200">
+    <div class="px-4 py-3 border-b border-gray-100 flex justify-between items-center">
+      <h2 class="font-semibold text-gray-700">Upcoming Follow-ups</h2>
+      <a href="/followups" class="text-xs text-indigo-500 hover:underline">View all</a>
+    </div>
+    <ul class="divide-y divide-gray-100">
+      {% for f in upcoming_followups[:5] %}
+      <li class="px-4 py-3 flex justify-between items-center">
+        <div>
+          <a href="/contacts/{{ f.contact.id }}" class="text-sm font-medium text-gray-900 hover:text-indigo-600">{{ f.contact.full_name }}</a>
+          <p class="text-xs text-gray-500">{{ f.description }}</p>
+        </div>
+        <div class="text-right">
+          <span class="text-xs text-yellow-600 font-medium">{{ f.due_date }}</span>
+          <form method="post" action="/followups/{{ f.id }}/complete" class="mt-1">
+            <button class="text-xs text-gray-400 hover:text-green-600">✓ Done</button>
+          </form>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  <!-- Recent Contacts -->
+  <div class="bg-white rounded-xl border border-gray-200">
+    <div class="px-4 py-3 border-b border-gray-100 flex justify-between items-center">
+      <h2 class="font-semibold text-gray-700">Recently Updated</h2>
+      <a href="/contacts" class="text-xs text-indigo-500 hover:underline">View all</a>
+    </div>
+    {% if recent_contacts %}
+    <ul class="divide-y divide-gray-100">
+      {% for c in recent_contacts %}
+      <li class="px-4 py-3">
+        <a href="/contacts/{{ c.id }}" class="flex items-center gap-3 hover:text-indigo-600">
+          {% include "partials/avatar.html" %}
+          <div>
+            <p class="text-sm font-medium">{{ c.full_name }}</p>
+            <p class="text-xs text-gray-400">{{ c.company or "" }}{% if c.company and c.job_title %} · {% endif %}{{ c.job_title or "" }}</p>
+          </div>
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="px-4 py-6 text-sm text-gray-400 text-center">No contacts yet. <a href="/contacts/new" class="text-indigo-500 hover:underline">Add one!</a></p>
+    {% endif %}
+  </div>
+
+  <!-- Recent Interactions -->
+  {% if recent_interactions %}
+  <div class="bg-white rounded-xl border border-gray-200">
+    <div class="px-4 py-3 border-b border-gray-100">
+      <h2 class="font-semibold text-gray-700">Recent Activity</h2>
+    </div>
+    <ul class="divide-y divide-gray-100">
+      {% for i in recent_interactions %}
+      <li class="px-4 py-3">
+        <div class="flex items-start gap-2">
+          <span class="mt-0.5 text-xs px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 font-mono">{{ i.type }}</span>
+          <div>
+            <a href="/contacts/{{ i.contact_id }}" class="text-sm font-medium text-gray-900 hover:text-indigo-600">{{ i.contact.full_name }}</a>
+            <p class="text-xs text-gray-500 line-clamp-2">{{ i.summary }}</p>
+            <p class="text-xs text-gray-300 mt-0.5">{{ i.occurred_at.strftime('%b %d, %Y') }}</p>
+          </div>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

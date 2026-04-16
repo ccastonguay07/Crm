@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Follow-ups – Personal CRM{% endblock %}
+{% block content %}
+
+<h1 class="text-2xl font-bold mb-6">Follow-ups</h1>
+
+<div x-data="{ tab: '{{ 'overdue' if overdue else 'upcoming' }}' }">
+
+  <!-- Tabs -->
+  <div class="flex gap-1 bg-gray-100 rounded-lg p-1 w-fit mb-6">
+    {% if overdue %}
+    <button @click="tab = 'overdue'" :class="tab === 'overdue' ? 'bg-white shadow text-red-600' : 'text-gray-500 hover:text-gray-700'" class="px-4 py-1.5 rounded-md text-sm font-medium transition">
+      Overdue ({{ overdue | length }})
+    </button>
+    {% endif %}
+    <button @click="tab = 'upcoming'" :class="tab === 'upcoming' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'" class="px-4 py-1.5 rounded-md text-sm font-medium transition">
+      This Week ({{ upcoming | length }})
+    </button>
+    <button @click="tab = 'all'" :class="tab === 'all' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'" class="px-4 py-1.5 rounded-md text-sm font-medium transition">
+      All Open ({{ all_open | length }})
+    </button>
+    <button @click="tab = 'done'" :class="tab === 'done' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'" class="px-4 py-1.5 rounded-md text-sm font-medium transition">
+      Done ({{ completed | length }})
+    </button>
+  </div>
+
+  {% macro followup_row(f, is_done=False) %}
+  <div class="px-4 py-3 flex items-center gap-3">
+    <div class="flex-1 min-w-0">
+      <div class="flex items-center gap-2">
+        <a href="/contacts/{{ f.contact.id }}" class="text-sm font-medium text-indigo-600 hover:underline">{{ f.contact.full_name }}</a>
+        {% if f.contact.company %}<span class="text-xs text-gray-400">· {{ f.contact.company }}</span>{% endif %}
+      </div>
+      <p class="text-sm {% if is_done %}text-gray-400 line-through{% else %}text-gray-700{% endif %}">{{ f.description }}</p>
+      <p class="text-xs {% if not is_done and f.due_date < today %}text-red-500 font-medium{% else %}text-gray-400{% endif %}">
+        Due {{ f.due_date }}{% if f.completed_at %} · Completed {{ f.completed_at.strftime('%b %d') }}{% endif %}
+      </p>
+    </div>
+    {% if not is_done %}
+    <form method="post" action="/followups/{{ f.id }}/complete">
+      <button class="text-xs border border-gray-200 text-gray-500 rounded px-2 py-1 hover:text-green-600 hover:border-green-300">✓ Done</button>
+    </form>
+    {% endif %}
+  </div>
+  {% endmacro %}
+
+  <!-- Overdue -->
+  {% if overdue %}
+  <div x-show="tab === 'overdue'">
+    {% if overdue %}
+    <div class="bg-white rounded-xl border border-red-200 divide-y divide-gray-100">
+      {% for f in overdue %}{{ followup_row(f) }}{% endfor %}
+    </div>
+    {% else %}
+    <p class="text-gray-400 text-sm text-center py-8">No overdue follow-ups.</p>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <!-- Upcoming -->
+  <div x-show="tab === 'upcoming'">
+    {% if upcoming %}
+    <div class="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
+      {% for f in upcoming %}{{ followup_row(f) }}{% endfor %}
+    </div>
+    {% else %}
+    <p class="text-gray-400 text-sm text-center py-8">No follow-ups due this week.</p>
+    {% endif %}
+  </div>
+
+  <!-- All open -->
+  <div x-show="tab === 'all'">
+    {% if all_open %}
+    <div class="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
+      {% for f in all_open %}{{ followup_row(f) }}{% endfor %}
+    </div>
+    {% else %}
+    <p class="text-gray-400 text-sm text-center py-8">No open follow-ups. You're all caught up!</p>
+    {% endif %}
+  </div>
+
+  <!-- Done -->
+  <div x-show="tab === 'done'">
+    {% if completed %}
+    <div class="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
+      {% for f in completed %}{{ followup_row(f, is_done=True) }}{% endfor %}
+    </div>
+    {% else %}
+    <p class="text-gray-400 text-sm text-center py-8">No completed follow-ups yet.</p>
+    {% endif %}
+  </div>
+
+</div>
+
+{% endblock %}

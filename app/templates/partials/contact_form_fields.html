@@ -1,0 +1,74 @@
+{% set existing = contact if contact is defined else None %}
+
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+  <div class="sm:col-span-2">
+    <label class="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
+    <input type="text" name="full_name" value="{{ existing.full_name if existing else '' }}" required
+      class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+  </div>
+  <div>
+    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+    <input type="email" name="email" value="{{ existing.email if existing and existing.email else '' }}"
+      class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+  </div>
+  <div>
+    <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+    <input type="text" name="phone" value="{{ existing.phone if existing and existing.phone else '' }}"
+      class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+  </div>
+  <div>
+    <label class="block text-sm font-medium text-gray-700 mb-1">Company</label>
+    <input type="text" name="company" value="{{ existing.company if existing and existing.company else '' }}"
+      class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+  </div>
+  <div>
+    <label class="block text-sm font-medium text-gray-700 mb-1">Job Title</label>
+    <input type="text" name="job_title" value="{{ existing.job_title if existing and existing.job_title else '' }}"
+      class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+  </div>
+  <div>
+    <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
+    <input type="text" name="location" value="{{ existing.location if existing and existing.location else '' }}"
+      class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+  </div>
+  <div>
+    <label class="block text-sm font-medium text-gray-700 mb-1">Birthday</label>
+    <input type="date" name="birthday" value="{{ existing.birthday if existing and existing.birthday else '' }}"
+      class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+  </div>
+  <div>
+    <label class="block text-sm font-medium text-gray-700 mb-1">LinkedIn URL</label>
+    <input type="url" name="linkedin_url" value="{{ existing.linkedin_url if existing and existing.linkedin_url else '' }}"
+      class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+  </div>
+  <div>
+    <label class="block text-sm font-medium text-gray-700 mb-1">Twitter Handle</label>
+    <input type="text" name="twitter_handle" value="{{ existing.twitter_handle if existing and existing.twitter_handle else '' }}" placeholder="without @"
+      class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+  </div>
+  <div>
+    <label class="block text-sm font-medium text-gray-700 mb-1">GitHub Username</label>
+    <input type="text" name="github_username" value="{{ existing.github_username if existing and existing.github_username else '' }}"
+      class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+  </div>
+  <div>
+    <label class="block text-sm font-medium text-gray-700 mb-1">Website</label>
+    <input type="url" name="website_url" value="{{ existing.website_url if existing and existing.website_url else '' }}"
+      class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+  </div>
+  <div>
+    <label class="block text-sm font-medium text-gray-700 mb-1">Profile Photo URL</label>
+    <input type="url" name="profile_photo_url" value="{{ existing.profile_photo_url if existing and existing.profile_photo_url else '' }}"
+      class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+  </div>
+  <div class="sm:col-span-2">
+    <label class="block text-sm font-medium text-gray-700 mb-1">Tags <span class="text-gray-400 font-normal">(comma-separated)</span></label>
+    <input type="text" name="tags" value="{{ existing.tags | map(attribute='name') | join(', ') if existing and existing.tags else '' }}" placeholder="friend, investor, colleague"
+      class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+  </div>
+  <div class="sm:col-span-2">
+    <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+    <textarea name="notes" rows="4" placeholder="Anything you want to remember..."
+      class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">{{ existing.notes if existing and existing.notes else '' }}</textarea>
+  </div>
+</div>

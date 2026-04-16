@@ -1,0 +1,7 @@
+{% if c.profile_photo_url %}
+<img src="{{ c.profile_photo_url }}" alt="{{ c.full_name }}" class="w-9 h-9 rounded-full object-cover flex-shrink-0" />
+{% else %}
+<div class="w-9 h-9 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-sm font-bold flex-shrink-0">
+  {{ c.full_name[0].upper() }}
+</div>
+{% endif %}

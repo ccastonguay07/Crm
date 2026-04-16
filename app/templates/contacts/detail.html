@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% block title %}{{ contact.full_name }} – Personal CRM{% endblock %}
+{% block content %}
+
+<div class="mb-4">
+  <a href="/contacts" class="text-sm text-gray-400 hover:text-gray-600">← All Contacts</a>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6" x-data="{ tab: 'overview' }">
+
+  <!-- Left: Profile -->
+  <div class="lg:col-span-1 space-y-4">
+    <div class="bg-white rounded-xl border border-gray-200 p-6 flex flex-col items-center text-center">
+      {% if contact.profile_photo_url %}
+      <img src="{{ contact.profile_photo_url }}" class="w-20 h-20 rounded-full object-cover mb-3" />
+      {% else %}
+      <div class="w-20 h-20 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-3xl font-bold mb-3">
+        {{ contact.full_name[0].upper() }}
+      </div>
+      {% endif %}
+      <h1 class="text-xl font-bold">{{ contact.full_name }}</h1>
+      {% if contact.job_title or contact.company %}
+      <p class="text-sm text-gray-500 mt-1">{{ contact.job_title or "" }}{% if contact.job_title and contact.company %} at {% endif %}{{ contact.company or "" }}</p>
+      {% endif %}
+      {% if contact.tags %}
+      <div class="flex flex-wrap gap-1 justify-center mt-2">
+        {% for t in contact.tags %}
+        <span class="px-2 py-0.5 rounded-full text-xs" style="background: {{ t.color }}22; color: {{ t.color }}">{{ t.name }}</span>
+        {% endfor %}
+      </div>
+      {% endif %}
+      <div class="flex gap-2 mt-4">
+        <a href="/contacts/{{ contact.id }}/edit" class="text-sm px-3 py-1.5 border border-gray-300 rounded-md hover:bg-gray-50">Edit</a>
+        <form method="post" action="/contacts/{{ contact.id }}/delete" onsubmit="return confirm('Delete this contact?')">
+          <button class="text-sm px-3 py-1.5 border border-red-300 text-red-500 rounded-md hover:bg-red-50">Delete</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Contact info -->
+    <div class="bg-white rounded-xl border border-gray-200 p-4 space-y-2 text-sm">
+      {% if contact.email %}
+      <div class="flex gap-2"><span class="text-gray-400 w-16 flex-shrink-0">Email</span><a href="mailto:{{ contact.email }}" class="text-indigo-600 hover:underline truncate">{{ contact.email }}</a></div>
+      {% endif %}
+      {% if contact.phone %}
+      <div class="flex gap-2"><span class="text-gray-400 w-16 flex-shrink-0">Phone</span><span>{{ contact.phone }}</span></div>
+      {% endif %}
+      {% if contact.location %}
+      <div class="flex gap-2"><span class="text-gray-400 w-16 flex-shrink-0">Location</span><span>{{ contact.location }}</span></div>
+      {% endif %}
+      {% if contact.birthday %}
+      <div class="flex gap-2"><span class="text-gray-400 w-16 flex-shrink-0">Birthday</span><span>{{ contact.birthday }}</span></div>
+      {% endif %}
+      {% if contact.linkedin_url %}
+      <div class="flex gap-2"><span class="text-gray-400 w-16 flex-shrink-0">LinkedIn</span><a href="{{ contact.linkedin_url }}" target="_blank" class="text-indigo-600 hover:underline truncate">Profile</a></div>
+      {% endif %}
+      {% if contact.twitter_handle %}
+      <div class="flex gap-2"><span class="text-gray-400 w-16 flex-shrink-0">Twitter</span><span>@{{ contact.twitter_handle }}</span></div>
+      {% endif %}
+      {% if contact.github_username %}
+      <div class="flex gap-2"><span class="text-gray-400 w-16 flex-shrink-0">GitHub</span><a href="https://github.com/{{ contact.github_username }}" target="_blank" class="text-indigo-600 hover:underline">{{ contact.github_username }}</a></div>
+      {% endif %}
+      {% if contact.website_url %}
+      <div class="flex gap-2"><span class="text-gray-400 w-16 flex-shrink-0">Website</span><a href="{{ contact.website_url }}" target="_blank" class="text-indigo-600 hover:underline truncate">{{ contact.website_url }}</a></div>
+      {% endif %}
+      {% if contact.last_contacted_at %}
+      <div class="flex gap-2 pt-1 border-t border-gray-100"><span class="text-gray-400 w-16 flex-shrink-0">Last seen</span><span class="text-gray-500">{{ contact.last_contacted_at.strftime('%b %d, %Y') }}</span></div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Right: Tabs -->
+  <div class="lg:col-span-2 space-y-4">
+
+    <!-- Tab buttons -->
+    <div class="flex gap-1 bg-gray-100 rounded-lg p-1 w-fit">
+      <button @click="tab = 'overview'" :class="tab === 'overview' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'" class="px-4 py-1.5 rounded-md text-sm font-medium transition">Overview</button>
+      <button @click="tab = 'interactions'" :class="tab === 'interactions' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'" class="px-4 py-1.5 rounded-md text-sm font-medium transition">Interactions ({{ interactions | length }})</button>
+      <button @click="tab = 'followups'" :class="tab === 'followups' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'" class="px-4 py-1.5 rounded-md text-sm font-medium transition">Follow-ups ({{ followups | length }})</button>
+    </div>
+
+    <!-- Overview tab -->
+    <div x-show="tab === 'overview'" class="bg-white rounded-xl border border-gray-200 p-5">
+      <h2 class="font-semibold mb-3">Notes</h2>
+      {% if contact.notes %}
+      <p class="text-sm text-gray-700 whitespace-pre-wrap">{{ contact.notes }}</p>
+      {% else %}
+      <p class="text-sm text-gray-400">No notes yet. Log an interaction or edit this contact to add notes.</p>
+      {% endif %}
+    </div>
+
+    <!-- Interactions tab -->
+    <div x-show="tab === 'interactions'" class="space-y-4">
+      <!-- Add interaction form -->
+      <div class="bg-white rounded-xl border border-gray-200 p-4">
+        <h3 class="font-semibold text-sm mb-3">Log Interaction</h3>
+        <form method="post" action="/contacts/{{ contact.id }}/interactions" class="flex flex-col gap-2">
+          <div class="flex gap-2">
+            <select name="type" class="border border-gray-300 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
+              <option value="note">Note</option>
+              <option value="meeting">Meeting</option>
+              <option value="call">Call</option>
+              <option value="email">Email</option>
+              <option value="other">Other</option>
+            </select>
+            <input type="text" name="summary" placeholder="What happened?" required class="flex-1 border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+          </div>
+          <button type="submit" class="self-end bg-indigo-600 text-white px-4 py-1.5 rounded-md text-sm hover:bg-indigo-700">Log</button>
+        </form>
+      </div>
+
+      <!-- Interaction list -->
+      {% if interactions %}
+      <div class="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
+        {% for i in interactions %}
+        <div class="px-4 py-3 flex gap-3">
+          <span class="mt-0.5 text-xs px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 font-mono h-fit">{{ i.type }}</span>
+          <div class="flex-1">
+            <p class="text-sm text-gray-800">{{ i.summary }}</p>
+            <p class="text-xs text-gray-300 mt-1">{{ i.occurred_at.strftime('%b %d, %Y %H:%M') }} via {{ i.source }}</p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="text-sm text-gray-400 py-4 text-center">No interactions logged yet.</p>
+      {% endif %}
+    </div>
+
+    <!-- Follow-ups tab -->
+    <div x-show="tab === 'followups'" class="space-y-4">
+      <!-- Add follow-up form -->
+      <div class="bg-white rounded-xl border border-gray-200 p-4">
+        <h3 class="font-semibold text-sm mb-3">Add Follow-up</h3>
+        <form method="post" action="/contacts/{{ contact.id }}/followups" class="flex flex-col gap-2">
+          <div class="flex gap-2">
+            <input type="date" name="due_date" required min="{{ today }}" class="border border-gray-300 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+            <input type="text" name="description" placeholder="What to do..." required class="flex-1 border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+          </div>
+          <button type="submit" class="self-end bg-indigo-600 text-white px-4 py-1.5 rounded-md text-sm hover:bg-indigo-700">Add</button>
+        </form>
+      </div>
+
+      <!-- Follow-up list -->
+      {% if followups %}
+      <div class="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
+        {% for f in followups %}
+        <div class="px-4 py-3 flex items-center gap-3">
+          <div class="flex-1">
+            <p class="text-sm {% if f.is_completed %}line-through text-gray-400{% else %}text-gray-800{% endif %}">{{ f.description }}</p>
+            <p class="text-xs {% if not f.is_completed and f.due_date < today %}text-red-500{% else %}text-gray-400{% endif %}">Due {{ f.due_date }}</p>
+          </div>
+          {% if not f.is_completed %}
+          <form method="post" action="/followups/{{ f.id }}/complete">
+            <button class="text-xs text-gray-400 hover:text-green-600 border border-gray-200 rounded px-2 py-1">✓ Done</button>
+          </form>
+          {% else %}
+          <span class="text-xs text-green-500">Done</span>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="text-sm text-gray-400 py-4 text-center">No follow-ups yet.</p>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}
