@@ -1,0 +1,1038 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Girls Just Want to Be One</title>
+<style>
+/* ============================================================
+   GIRLS JUST WANT TO BE ONE — first birthday invitation
+   A 45 rpm record sleeve, not a synthwave grid.
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; padding: 0; }
+img, canvas { display: block; max-width: 100%; }
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  text-transform: inherit;   /* the UA sheet forces `none` and eats .h-display */
+  text-align: inherit;
+}
+a { color: inherit; }
+
+:root {
+  /* --- ink & paper (daylight sleeve) --- */
+  --ink:      #2B1B3D;
+  --paper:    #FFF3DC;
+  --panel:    #FFFCF2;
+  --line:     #2B1B3D;
+  --shadow:   #2B1B3D;
+  --muted:    #6E5A80;
+  --vinyl:    #2B1B3D;
+
+  /* --- the crayon box (constant across themes) --- */
+  --magenta:   #FF2E88;
+  --tangerine: #FF7A29;
+  --turquoise: #12C2C2;
+  --grape:     #6B2FBF;
+  --lemon:     #FFD23F;
+
+  /* --- type --- */
+  --display: Impact, Haettenschweiler, "Franklin Gothic Bold", "Arial Black", sans-serif;
+  --body:    "Trebuchet MS", "Segoe UI", Tahoma, sans-serif;
+  --mono:    "Courier New", Courier, monospace;
+
+  /* --- scale --- */
+  --s-xs: 0.75rem;
+  --s-sm: 0.875rem;
+  --s-md: 1rem;
+  --s-lg: 1.33rem;
+  --s-xl: 1.77rem;
+  --s-2xl: 2.37rem;
+
+  --edge: 3px;
+  --pop: 8px;
+}
+
+/* Night pressing: same sleeve under a disco light. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink:    #FFF3DC;
+    --paper:  #241238;
+    --panel:  #33194D;
+    --line:   #FFF3DC;
+    --shadow: #12051F;
+    --muted:  #C6ADE0;
+    --vinyl:  #0E0418;
+  }
+}
+:root[data-theme="dark"] {
+  --ink:    #FFF3DC;
+  --paper:  #241238;
+  --panel:  #33194D;
+  --line:   #FFF3DC;
+  --shadow: #12051F;
+  --muted:  #C6ADE0;
+  --vinyl:  #0E0418;
+}
+:root[data-theme="light"] {
+  --ink:    #2B1B3D;
+  --paper:  #FFF3DC;
+  --panel:  #FFFCF2;
+  --line:   #2B1B3D;
+  --shadow: #2B1B3D;
+  --muted:  #6E5A80;
+  --vinyl:  #2B1B3D;
+}
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  font-family: var(--body);
+  font-size: var(--s-md);
+  line-height: 1.6;
+  color: var(--ink);
+  background-color: var(--paper);
+  background-image:
+    repeating-linear-gradient(115deg,
+      rgba(255,46,136,.05) 0 14px,
+      rgba(0,0,0,0) 14px 28px);
+  overflow-x: hidden;
+}
+
+/* Ambient balloon + confetti layer sits behind everything readable. */
+#sky {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.page {
+  position: relative;
+  z-index: 1;
+  width: min(100% - 2rem, 62rem);
+  margin-inline: auto;
+  padding-block: clamp(2rem, 6vw, 4.5rem) 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(3rem, 8vw, 6rem);
+}
+
+/* ---------- shared print-object treatment ---------- */
+
+.card {
+  position: relative;
+  background: var(--panel);
+  border: var(--edge) solid var(--line);
+  box-shadow: var(--pop) var(--pop) 0 var(--shadow);
+}
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: var(--s-xs);
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.h-display {
+  font-family: var(--display);
+  font-weight: 400;
+  line-height: .95;
+  letter-spacing: .01em;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+/* ============================================================
+   HERO — the 45 sleeve
+   ============================================================ */
+
+.hero {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  padding: clamp(1.75rem, 5vw, 3.25rem) clamp(1rem, 4vw, 2.5rem) clamp(2rem, 5vw, 3rem);
+  isolation: isolate;
+  overflow: hidden;
+}
+
+/* The record slides out of the bottom-right of the sleeve and is clipped by
+   the card edge. It stays clear of the title so nothing sits on top of it. */
+.vinyl {
+  position: absolute;
+  z-index: -1;
+  right: clamp(-6rem, -8vw, -3rem);
+  bottom: clamp(-5rem, -7vw, -2.5rem);
+  width: clamp(9rem, 34vw, 22rem);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    /* spindle hole, label, grooves, then the disc itself */
+    radial-gradient(circle at center, var(--paper) 0 2%, transparent 2.2%),
+    radial-gradient(circle at center, var(--magenta) 0 23%, transparent 23.4%),
+    repeating-radial-gradient(circle at center,
+      rgba(255,243,220,.10) 0 1px,
+      rgba(255,243,220,0) 1px 6px),
+    radial-gradient(circle at center, var(--vinyl) 0 70%, transparent 70.4%);
+  box-shadow: inset 0 0 0 2px var(--line);
+  animation: spin 14s linear infinite;
+}
+@keyframes spin { to { rotate: 360deg; } }
+
+.hero__eyebrow {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: .55em;
+  padding: .4rem .85rem;
+  background: var(--lemon);
+  color: #2B1B3D;
+  border: 2px solid #2B1B3D;
+  rotate: -1.5deg;
+}
+
+.hero__title {
+  margin-top: 1.25rem;
+  font-size: clamp(2.75rem, 13vw, 8rem);
+}
+.hero__title .line { display: block; }
+.hero__title .line--girls { color: var(--magenta); }
+.hero__title .line--just  {
+  color: var(--grape);
+  font-size: .58em;
+  margin-top: .1em;
+}
+.hero__title .line--one   {
+  color: var(--tangerine);
+  font-size: 1.5em;
+  line-height: .92;
+  letter-spacing: -.02em;
+  margin-top: .04em;
+}
+
+/* every letter gets the hard print offset — no soft blur anywhere */
+.hero__title .ch {
+  display: inline-block;
+  text-shadow: 4px 4px 0 var(--ink);
+  will-change: transform;
+}
+
+/* the big ONE is a button you can whack for confetti */
+.one-btn {
+  display: block;
+  cursor: pointer;
+  transition: rotate .18s ease, scale .18s ease;
+}
+.one-btn:hover, .one-btn:focus-visible { rotate: -2deg; scale: 1.04; }
+.one-btn:focus-visible { outline: 4px dashed var(--turquoise); outline-offset: 10px; }
+.one-btn:active { scale: .97; }
+
+.hero__sub {
+  max-width: 34ch;
+  margin-top: 1.5rem;
+  font-size: var(--s-lg);
+  text-wrap: balance;
+}
+
+.hero__hint {
+  margin-top: .6rem;
+  font-family: var(--mono);
+  font-size: var(--s-xs);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: .9rem;
+  margin-top: 2rem;
+}
+
+.btn {
+  display: inline-block;
+  padding: .7rem 1.4rem;
+  font-family: var(--mono);
+  font-size: var(--s-sm);
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #2B1B3D;
+  border: 3px solid #2B1B3D;
+  box-shadow: 5px 5px 0 #2B1B3D;
+  cursor: pointer;
+  transition: translate .12s ease, box-shadow .12s ease;
+}
+.btn:hover, .btn:focus-visible { translate: 3px 3px; box-shadow: 2px 2px 0 #2B1B3D; }
+.btn:focus-visible { outline: 3px dashed var(--grape); outline-offset: 4px; }
+.btn--go   { background: var(--turquoise); }
+.btn--rsvp { background: var(--magenta); color: #FFF3DC; }
+
+/* ============================================================
+   COUNTDOWN
+   ============================================================ */
+
+.countdown {
+  padding: 1.5rem clamp(1rem, 4vw, 2rem);
+  rotate: -.6deg;
+  background: var(--grape);
+  border-color: var(--grape);
+  color: #FFF3DC;
+  text-align: center;
+}
+.countdown .eyebrow { color: var(--lemon); }
+
+.clock {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  justify-content: center;
+  gap: 1rem clamp(.75rem, 4vw, 2.25rem);
+  margin-top: 1rem;
+  list-style: none;
+}
+@media (min-width: 34rem) {
+  .clock { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+.clock b {
+  display: block;
+  font-family: var(--mono);
+  font-size: clamp(2rem, 8vw, 3.25rem);
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--lemon);
+}
+.clock b.tick { animation: tick .3s ease; }
+@keyframes tick {
+  50% { scale: 1.18; color: #FFF3DC; }
+}
+.clock span {
+  font-family: var(--mono);
+  font-size: var(--s-xs);
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+
+.countdown__over {
+  font-family: var(--display);
+  font-size: clamp(1.6rem, 7vw, 3rem);
+  text-transform: uppercase;
+  color: var(--lemon);
+  line-height: 1;
+  margin-top: .75rem;
+}
+
+/* ============================================================
+   DETAILS — the cassette J-card
+   ============================================================ */
+
+.details { display: grid; gap: 1.5rem; }
+
+.section-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: .75rem;
+}
+.section-head h2 {
+  font-family: var(--display);
+  font-size: clamp(1.9rem, 6vw, 3rem);
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--ink);
+}
+.section-head .rule {
+  flex: 1;
+  min-width: 2rem;
+  height: var(--edge);
+  background: var(--magenta);
+}
+
+.jcard {
+  display: grid;
+  grid-template-columns: 1fr;   /* becomes the 2x2 the border rules below assume */
+  gap: 0;
+  rotate: .5deg;
+}
+.jcard > div {
+  padding: 1.35rem 1.4rem;
+  border-bottom: var(--edge) solid var(--line);
+}
+.jcard > div:last-child { border-bottom: none; }
+
+@media (min-width: 46rem) {
+  .jcard { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .jcard > div { border-right: var(--edge) solid var(--line); border-bottom: none; }
+  .jcard > div:nth-child(2n) { border-right: none; }
+  .jcard > div:nth-child(-n+2) { border-bottom: var(--edge) solid var(--line); }
+}
+
+.jcard dt {
+  font-family: var(--mono);
+  font-size: var(--s-xs);
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--magenta);
+  margin-bottom: .35rem;
+}
+.jcard dd { font-size: var(--s-lg); line-height: 1.35; }
+.jcard dd small {
+  display: block;
+  margin-top: .3rem;
+  font-size: var(--s-sm);
+  line-height: 1.5;
+  color: var(--muted);
+}
+.jcard a { text-decoration-thickness: 2px; text-underline-offset: 3px; }
+
+/* The cassette, drawn in divs: orange shell, cream label window, two reels
+   with the tape running between them. */
+.cassette {
+  display: flex;
+  justify-content: center;
+  padding: 1.5rem 1.25rem;
+  background: var(--tangerine);
+  border-top: var(--edge) solid var(--line);
+}
+.cassette__shell {
+  width: min(100%, 24rem);
+  padding: 1rem 1.25rem;
+  background: #FFF3DC;
+  border: var(--edge) solid #2B1B3D;
+  box-shadow: 4px 4px 0 #2B1B3D;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+}
+.reel {
+  flex: 0 0 auto;
+  width: clamp(2.5rem, 9vw, 3.25rem);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #FFF3DC;
+  border: 3px solid #2B1B3D;
+  position: relative;
+  z-index: 1;
+  animation: spin 3.2s linear infinite;
+}
+/* hub teeth + spindle */
+.reel::before, .reel::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+}
+.reel::before {
+  inset: 24%;
+  border: 3px dashed #2B1B3D;
+}
+.reel::after {
+  inset: 42%;
+  background: #2B1B3D;
+}
+/* the tape spanning the two reels */
+.tape-window {
+  flex: 1 1 auto;
+  height: 1.15rem;
+  margin-inline: -.5rem;
+  background: #2B1B3D;
+  border-top: 3px solid var(--magenta);
+}
+
+/* ============================================================
+   TRACKLIST — the schedule as a mixtape
+   ============================================================ */
+
+.sides {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  gap: 1.5rem;
+}
+
+.side { padding: 1.4rem 1.5rem 1.6rem; }
+.side--a { rotate: -.8deg; }
+.side--b { rotate: .8deg; }
+
+.side h3 {
+  font-family: var(--display);
+  font-size: var(--s-2xl);
+  text-transform: uppercase;
+  line-height: 1;
+  margin-bottom: .2rem;
+}
+.side--a h3 { color: var(--turquoise); }
+.side--b h3 { color: var(--magenta); }
+
+.side p.side__note {
+  font-family: var(--mono);
+  font-size: var(--s-xs);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 1rem;
+}
+
+.tracks { list-style: none; display: grid; gap: .1rem; }
+
+.tracks li {
+  display: grid;
+  grid-template-columns: 2.5rem 4.5rem 1fr;
+  align-items: baseline;
+  gap: .5rem;
+  padding: .55rem 0;
+  border-bottom: 2px dotted var(--muted);
+}
+.tracks li:last-child { border-bottom: none; }
+
+.tracks .no {
+  font-family: var(--mono);
+  font-size: var(--s-xs);
+  font-weight: 700;
+  color: var(--muted);
+}
+.tracks .at {
+  font-family: var(--mono);
+  font-size: var(--s-sm);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.tracks .what { font-size: var(--s-md); }
+.tracks .what em {
+  display: block;
+  font-style: normal;
+  font-size: var(--s-sm);
+  color: var(--muted);
+}
+.tracks li.star .what { font-weight: 700; }
+.tracks li.star .at { color: var(--tangerine); }
+
+/* ============================================================
+   RSVP
+   ============================================================ */
+
+.rsvp {
+  padding: clamp(1.75rem, 5vw, 2.75rem);
+  text-align: center;
+  background: var(--magenta);
+  border-color: var(--magenta);
+  color: #FFF3DC;
+  rotate: -.4deg;
+}
+.rsvp h2 {
+  font-family: var(--display);
+  font-size: clamp(2rem, 8vw, 3.75rem);
+  text-transform: uppercase;
+  line-height: .9;
+  text-shadow: 4px 4px 0 #2B1B3D;
+}
+.rsvp p { max-width: 40ch; margin: .9rem auto 0; text-wrap: balance; }
+.rsvp .btn--rsvp {
+  background: var(--lemon);
+  color: #2B1B3D;
+  margin-top: 1.5rem;
+}
+.rsvp__by {
+  margin-top: 1rem;
+  font-family: var(--mono);
+  font-size: var(--s-xs);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+
+.foot {
+  text-align: center;
+  font-family: var(--mono);
+  font-size: var(--s-xs);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ============================================================
+   MOTION
+   ============================================================ */
+
+/* Only hide these once we know JS is running to bring them back. */
+.js .reveal {
+  opacity: 0;
+  translate: 0 26px;
+  transition: opacity .5s ease, translate .5s cubic-bezier(.2, 1.5, .4, 1);
+}
+.js .reveal.in { opacity: 1; translate: 0 0; }
+
+/* letters drop in and settle */
+.ch.drop { animation: drop .6s cubic-bezier(.2, 1.4, .35, 1) backwards; }
+@keyframes drop {
+  from { opacity: 0; translate: 0 -.5em; rotate: -8deg; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+  .js .reveal { opacity: 1; translate: 0 0; }
+  .vinyl, .reel { animation: none; }
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.classList.add("js");</script>
+
+<canvas id="sky" aria-hidden="true"></canvas>
+
+<main class="page">
+
+  <!-- ============ HERO ============ -->
+  <header class="hero card">
+    <div class="vinyl" aria-hidden="true"></div>
+
+    <p class="hero__eyebrow eyebrow"><span>Saturday</span><span>&middot;</span><span>September 12</span><span>&middot;</span><span>2026</span></p>
+
+    <h1 class="hero__title h-display" aria-label="Girls just want to be one">
+      <span class="line line--girls" data-split>Girls</span>
+      <span class="line line--just" data-split>Just want to be</span>
+      <button class="one-btn line line--one" type="button" data-split data-confetti aria-label="One — tap for confetti">One</button>
+    </h1>
+
+    <p class="hero__sub" id="hero-sub">Nora turns one, and we are throwing the loudest little party in Henderson. Come celebrate with us.</p>
+    <p class="hero__hint">Tap the ONE &rarr;</p>
+
+    <div class="actions">
+      <a class="btn btn--go" id="map-link" href="#" target="_blank" rel="noopener">Get directions</a>
+      <a class="btn btn--rsvp" id="rsvp-top" href="#rsvp">RSVP</a>
+    </div>
+  </header>
+
+  <!-- ============ COUNTDOWN ============ -->
+  <section class="countdown card reveal" aria-labelledby="cd-title">
+    <p class="eyebrow" id="cd-title">Time until the cake</p>
+    <ul class="clock" id="clock">
+      <li><b data-unit="days">--</b><span>Days</span></li>
+      <li><b data-unit="hours">--</b><span>Hours</span></li>
+      <li><b data-unit="minutes">--</b><span>Minutes</span></li>
+      <li><b data-unit="seconds">--</b><span>Seconds</span></li>
+    </ul>
+    <p class="countdown__over" id="clock-over" hidden>She&rsquo;s one! Come on in.</p>
+  </section>
+
+  <!-- ============ DETAILS ============ -->
+  <section class="details reveal" aria-labelledby="details-title">
+    <div class="section-head">
+      <h2 id="details-title">The Details</h2>
+      <span class="rule" aria-hidden="true"></span>
+    </div>
+
+    <div class="card">
+      <dl class="jcard">
+        <div>
+          <dt>When</dt>
+          <dd>Saturday, September 12<small>Doors at 10:00 AM. We&rsquo;ll wrap around 1:00 PM.</small></dd>
+        </div>
+        <div>
+          <dt>Where</dt>
+          <dd>3234 Morning Springs Drive<small>Henderson, Nevada 89074 &mdash; <a id="map-link-2" href="#" target="_blank" rel="noopener">open in maps</a></small></dd>
+        </div>
+        <div>
+          <dt>Dress code</dt>
+          <dd>Loud<small>Neon, denim, tulle, sunglasses indoors. Big hair encouraged, not required.</small></dd>
+        </div>
+        <div>
+          <dt>Bring</dt>
+          <dd>Just yourselves<small>No gifts, please. There will be sunscreen, shade, and more snacks than anyone needs.</small></dd>
+        </div>
+      </dl>
+      <div class="cassette" aria-hidden="true">
+        <div class="cassette__shell">
+          <div class="reel"></div>
+          <div class="tape-window"></div>
+          <div class="reel"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TRACKLIST ============ -->
+  <section class="reveal" aria-labelledby="run-title">
+    <div class="section-head">
+      <h2 id="run-title">The Run of Show</h2>
+      <span class="rule" aria-hidden="true"></span>
+    </div>
+
+    <div class="sides" style="margin-top:1.5rem">
+      <div class="side side--a card">
+        <h3>Side A</h3>
+        <p class="side__note">Morning &middot; 45 min</p>
+        <ol class="tracks">
+          <li><span class="no">A1</span><span class="at">10:00</span><span class="what">Doors open<em>Come as you are, only louder</em></span></li>
+          <li><span class="no">A2</span><span class="at">10:20</span><span class="what">Bubble machine goes on<em>The backyard becomes unusable in the best way</em></span></li>
+          <li><span class="no">A3</span><span class="at">10:45</span><span class="what">Snacks &amp; sippy cups<em>Coffee for the grown-ups, obviously</em></span></li>
+        </ol>
+      </div>
+
+      <div class="side side--b card">
+        <h3>Side B</h3>
+        <p class="side__note">Midday &middot; 60 min</p>
+        <ol class="tracks">
+          <li class="star"><span class="no">B1</span><span class="at">11:30</span><span class="what">The cake smash<em>The main event. Have your camera ready</em></span></li>
+          <li><span class="no">B2</span><span class="at">12:00</span><span class="what">Presents &amp; photos<em>Group shot by the balloon arch</em></span></li>
+          <li><span class="no">B3</span><span class="at">12:30</span><span class="what">Last dance<em>One more round before naptime wins</em></span></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RSVP ============ -->
+  <section class="rsvp card reveal" id="rsvp" aria-labelledby="rsvp-title">
+    <h2 id="rsvp-title">Say you&rsquo;ll be there</h2>
+    <p>Let us know how many are coming so we can count cupcakes. Little ones and siblings are always welcome.</p>
+    <a class="btn btn--rsvp" id="rsvp-link" href="#">RSVP by email</a>
+    <p class="rsvp__by">Please reply by September 5</p>
+  </section>
+
+  <footer class="foot">
+    <p>3234 Morning Springs Drive &middot; Henderson, NV 89074</p>
+  </footer>
+
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ==========================================================
+     EDIT ME — everything party-specific lives here.
+     ========================================================== */
+  var CONFIG = {
+    name: "Nora",                                   // PLACEHOLDER — put the birthday girl's name here
+    address: "3234 Morning Springs Drive, Henderson, NV 89074",
+    rsvpEmail: "ccastonguay07@gmail.com",
+    rsvpSubject: "RSVP — Girls Just Want to Be One",
+    // Party start: Sat Sep 12 2026, 10:00 AM Pacific (UTC−7 during DST)
+    startsAtISO: "2026-09-12T17:00:00Z"
+  };
+
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- wire up config-driven content ---------- */
+
+  var mapURL = "https://www.google.com/maps/search/?api=1&query=" +
+               encodeURIComponent(CONFIG.address);
+  ["map-link", "map-link-2"].forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el) el.href = mapURL;
+  });
+
+  var rsvp = document.getElementById("rsvp-link");
+  if (rsvp) {
+    rsvp.href = "mailto:" + CONFIG.rsvpEmail +
+                "?subject=" + encodeURIComponent(CONFIG.rsvpSubject);
+  }
+
+  var sub = document.getElementById("hero-sub");
+  if (sub) {
+    sub.textContent = CONFIG.name + " turns one, and we are throwing the loudest " +
+                      "little party in Henderson. Come celebrate with us.";
+  }
+
+  /* ==========================================================
+     Split the title into letters so they can drop in.
+     The h1 carries an aria-label, so the spans are decorative.
+     ========================================================== */
+
+  function splitLetters(el, startDelay) {
+    var text = el.textContent;
+    var frag = document.createDocumentFragment();
+    var i, span, delay = startDelay;
+
+    for (i = 0; i < text.length; i++) {
+      if (text[i] === " ") {
+        frag.appendChild(document.createTextNode(" "));
+        continue;
+      }
+      span = document.createElement("span");
+      span.className = "ch" + (reduced ? "" : " drop");
+      span.textContent = text[i];
+      if (!reduced) span.style.animationDelay = delay.toFixed(3) + "s";
+      frag.appendChild(span);
+      delay += 0.045;
+    }
+    el.textContent = "";
+    el.appendChild(frag);
+    return delay;
+  }
+
+  var title = document.querySelector(".hero__title");
+  if (title) {
+    title.setAttribute("aria-label", "Girls just want to be one");
+    var t = 0.15;
+    Array.prototype.forEach.call(title.querySelectorAll("[data-split]"), function (line) {
+      line.setAttribute("aria-hidden", "true");
+      t = splitLetters(line, t);
+    });
+  }
+
+  /* ==========================================================
+     Countdown
+     ========================================================== */
+
+  var target = new Date(CONFIG.startsAtISO).getTime();
+  var clock = document.getElementById("clock");
+  var over = document.getElementById("clock-over");
+  var cells = {};
+  var last = {};
+
+  if (clock) {
+    Array.prototype.forEach.call(clock.querySelectorAll("[data-unit]"), function (b) {
+      cells[b.getAttribute("data-unit")] = b;
+    });
+  }
+
+  function pad(n) { return n < 10 ? "0" + n : String(n); }
+
+  function setCell(unit, value) {
+    var el = cells[unit];
+    if (!el || last[unit] === value) return;
+    last[unit] = value;
+    el.textContent = value;
+    if (reduced) return;
+    el.classList.remove("tick");
+    void el.offsetWidth;          // restart the animation
+    el.classList.add("tick");
+  }
+
+  function renderClock() {
+    var left = target - Date.now();
+
+    if (left <= 0) {
+      if (clock) clock.hidden = true;
+      if (over) over.hidden = false;
+      return false;
+    }
+
+    var s = Math.floor(left / 1000);
+    setCell("days", String(Math.floor(s / 86400)));
+    setCell("hours", pad(Math.floor(s / 3600) % 24));
+    setCell("minutes", pad(Math.floor(s / 60) % 60));
+    setCell("seconds", pad(s % 60));
+    return true;
+  }
+
+  if (renderClock()) {
+    setInterval(renderClock, 1000);
+  }
+
+  /* ==========================================================
+     Sky: ambient balloons + confetti bursts, one canvas.
+     ========================================================== */
+
+  var canvas = document.getElementById("sky");
+  var ctx = canvas.getContext("2d");
+  var W = 0, H = 0, dpr = 1;
+  var COLORS = ["#FF2E88", "#FF7A29", "#12C2C2", "#6B2FBF", "#FFD23F"];
+  var balloons = [];
+  var confetti = [];
+  var running = true;
+
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width = Math.floor(W * dpr);
+    canvas.height = Math.floor(H * dpr);
+    canvas.style.width = W + "px";
+    canvas.style.height = H + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function rand(a, b) { return a + Math.random() * (b - a); }
+
+  function makeBalloon(seeded) {
+    return {
+      x: rand(0, W),
+      y: seeded ? rand(0, H) : H + rand(40, 220),
+      r: rand(14, 30),
+      speed: rand(0.22, 0.6),
+      sway: rand(0.4, 1.3),
+      phase: rand(0, Math.PI * 2),
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      alpha: rand(0.3, 0.6)
+    };
+  }
+
+  function seedBalloons() {
+    var count = W < 640 ? 7 : 13;
+    balloons = [];
+    for (var i = 0; i < count; i++) balloons.push(makeBalloon(true));
+  }
+
+  function drawBalloon(b) {
+    var x = b.x + Math.sin(b.y / 90 + b.phase) * b.sway * 12;
+
+    ctx.globalAlpha = b.alpha;
+    ctx.fillStyle = b.color;
+
+    ctx.beginPath();
+    ctx.ellipse(x, b.y, b.r * 0.82, b.r, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // knot
+    ctx.beginPath();
+    ctx.moveTo(x - b.r * 0.16, b.y + b.r);
+    ctx.lineTo(x + b.r * 0.16, b.y + b.r);
+    ctx.lineTo(x, b.y + b.r * 1.22);
+    ctx.closePath();
+    ctx.fill();
+
+    // string
+    ctx.globalAlpha = b.alpha * 0.55;
+    ctx.strokeStyle = b.color;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(x, b.y + b.r * 1.2);
+    ctx.quadraticCurveTo(x + b.sway * 10, b.y + b.r * 2.1, x, b.y + b.r * 3);
+    ctx.stroke();
+  }
+
+  function burst(originX, originY, amount) {
+    var n = Math.min(amount, 220 - confetti.length);
+    for (var i = 0; i < n; i++) {
+      var angle = rand(-Math.PI * 0.92, -Math.PI * 0.08);
+      var speed = rand(6, 15);
+      confetti.push({
+        x: originX,
+        y: originY,
+        vx: Math.cos(angle) * speed * rand(0.6, 1.2),
+        vy: Math.sin(angle) * speed,
+        w: rand(6, 12),
+        h: rand(8, 16),
+        rot: rand(0, Math.PI * 2),
+        spin: rand(-0.28, 0.28),
+        color: COLORS[Math.floor(Math.random() * COLORS.length)],
+        life: 1
+      });
+    }
+  }
+
+  function step() {
+    ctx.clearRect(0, 0, W, H);
+
+    var i, b, c;
+
+    for (i = 0; i < balloons.length; i++) {
+      b = balloons[i];
+      b.y -= b.speed;
+      if (b.y + b.r * 3 < -20) balloons[i] = makeBalloon(false);
+      drawBalloon(b);
+    }
+
+    for (i = confetti.length - 1; i >= 0; i--) {
+      c = confetti[i];
+      c.vy += 0.32;             // gravity
+      c.vx *= 0.992;            // drag
+      c.x += c.vx;
+      c.y += c.vy;
+      c.rot += c.spin;
+      c.life -= 0.006;
+
+      if (c.life <= 0 || c.y > H + 60) {
+        confetti.splice(i, 1);
+        continue;
+      }
+
+      ctx.globalAlpha = Math.max(c.life, 0);
+      ctx.fillStyle = c.color;
+      ctx.save();
+      ctx.translate(c.x, c.y);
+      ctx.rotate(c.rot);
+      ctx.fillRect(-c.w / 2, -c.h / 2, c.w, c.h);
+      ctx.restore();
+    }
+
+    ctx.globalAlpha = 1;
+    if (running) requestAnimationFrame(step);
+  }
+
+  if (!reduced) {
+    resize();
+    seedBalloons();
+    requestAnimationFrame(step);
+
+    var resizeTimer;
+    window.addEventListener("resize", function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function () { resize(); seedBalloons(); }, 150);
+    });
+
+    // don't burn battery in a background tab
+    document.addEventListener("visibilitychange", function () {
+      if (document.hidden) {
+        running = false;
+      } else if (!running) {
+        running = true;
+        requestAnimationFrame(step);
+      }
+    });
+
+    // opening pop, from behind the title
+    window.setTimeout(function () {
+      burst(W * 0.5, H * 0.42, 140);
+    }, 700);
+  } else {
+    canvas.hidden = true;
+  }
+
+  /* ---------- whack the ONE ---------- */
+
+  var oneBtn = document.querySelector("[data-confetti]");
+  if (oneBtn) {
+    oneBtn.addEventListener("click", function () {
+      if (reduced) return;
+      var box = oneBtn.getBoundingClientRect();
+      burst(box.left + box.width / 2, box.top + box.height / 2, 110);
+    });
+  }
+
+  /* ==========================================================
+     Scroll reveals
+     ========================================================== */
+
+  var revealables = document.querySelectorAll(".reveal");
+
+  if (reduced || !("IntersectionObserver" in window)) {
+    Array.prototype.forEach.call(revealables, function (el) { el.classList.add("in"); });
+  } else {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("in");
+        io.unobserve(entry.target);
+      });
+    }, { rootMargin: "0px 0px -12% 0px" });
+
+    Array.prototype.forEach.call(revealables, function (el) { io.observe(el); });
+  }
+})();
+</script>
+
+</body>
+</html>
